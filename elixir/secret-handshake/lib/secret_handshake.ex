@@ -1,5 +1,6 @@
 defmodule SecretHandshake do
   use Bitwise
+
   @doc """
   Determine the actions of a secret handshake based on the binary
   representation of the given `code`.
@@ -14,56 +15,14 @@ defmodule SecretHandshake do
 
   10000 = Reverse the order of the operations in the secret handshake
   """
-  # @spec commands(code :: integer) :: list(String.t())
-  # def commands(code) do
-  #   secret = %{ 0b1 => "wink", 0b10 => "double blink", 0b100 => "close your eyes", 0b1000 => "jump"}
-
-  #   handshake = [0b1, 0b10, 0b100, 0b1000]
-  #   |> Enum.filter( &((&1 &&& code) != 0) )
-  #   |> Enum.map( &(secret[&1]) )
-
-  #   if (code &&& 0b10000) == 0, do: Enum.reverse(handshake), else: handshake
-  # end
-
   @spec commands(code :: integer) :: list(String.t())
-  def commands(code) do
-    secret = %{ 0b1 => "wink", 0b10 => "double blink", 0b100 => "close your eyes", 0b1000 => "jump"}
+  def commands(code) when code > 31, do: []
+  def commands(code), do: append(code, [])
 
-    handshake = [0b1, 0b10, 0b100, 0b1000]
-    |> Enum.filter( &((&1 &&& code) != 0) )
-    |> Enum.map( &(secret[&1]) )
-
-    if (code &&& 0b10000) == 0, do: Enum.reverse(handshake), else: handshake
-  end
-
-  # @spec commands(code :: integer) :: list(String.t())
-  # def commands(code) do
-  #   commands(code, [])
-  # end
-
-  # def commands(code, handshake) when code == 0 do
-  #   unless List.first(handshake) do
-  #     Enum.reverse(handshake)
-  #   end
-  # end
-
-  # def commands(code, handshake) when rem(code, 16) == 0  do
-  #   commands(code - 16, [true | handshake])
-  # end
-
-  # def commands(code, handshake) when rem(code, 8) == 0  do
-  #   commands(code - 8, ["jump" | handshake])
-  # end
-
-  # def commands(code, handshake) when rem(code, 4) == 0  do
-  #   commands(code - 4, ["close your eyes" | handshake])
-  # end
-
-  # def commands(code, handshake) when rem(code, 2) == 0  do
-  #   commands(code - 2, ["double blink" | handshake])
-  # end
-
-  # def commands(code, handshake) when rem(code, 2) == 1  do
-  #   commands(code - 1, ["wink" | handshake])
-  # end
+  defp append(code, acc) when code == 0, do: acc
+  defp append(code, acc) when (code &&& 8) == 8, do: append(code - 8, ["jump" | acc])
+  defp append(code, acc) when (code &&& 4) == 4, do: append(code - 4, ["close your eyes" | acc])
+  defp append(code, acc) when (code &&& 2) == 2, do: append(code - 2, ["double blink" | acc])
+  defp append(code, acc) when (code &&& 1) == 1, do: append(code - 1, ["wink" | acc])
+  defp append(code, acc) when (code &&& 16) == 16, do: Enum.reverse(acc)
 end
