@@ -1,5 +1,7 @@
 defmodule RotationalCipher do
   @alphabet_length 26
+  @lower_case ?a..?z
+  @upper_case ?A..?Z
 
   @doc """
   Given a plaintext and amount to shift by, return a rotated string.
@@ -11,11 +13,18 @@ defmodule RotationalCipher do
   @spec rotate(text :: String.t(), shift :: integer) :: String.t()
   def rotate(text, shift) do
     text
-      |> String.to_charlist()
-      |> Enum.map(&(&1 + rem(shift, @alphabet_length)))
-      |> List.to_string()
-    # for <<char <- text>>, into: ""  do
-    #   <<char + rem(shift, @alphabet_length)>>
-    # end
+    |> String.to_charlist()
+    |> Enum.map(&rotate_letter(&1, shift))
+    |> List.to_string()
   end
+
+  defp rotate_letter(letter, shift) when letter in @lower_case do
+    ?a + rem(shift + letter - ?a, @alphabet_length)
+  end
+
+  defp rotate_letter(letter, shift) when letter in @upper_case do
+    ?A + rem(shift + letter - ?A, @alphabet_length)
+  end
+
+  defp rotate_letter(letter, _shift), do: letter
 end
